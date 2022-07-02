@@ -1,0 +1,203 @@
+Intel(R) Advisor can now assist with vectorization and show optimization
+  report messages with your source code.
+See "https://software.intel.com/en-us/intel-advisor-xe" for details.
+
+Intel(R) C++ Intel(R) 64 Compiler for applications running on Intel(R) 64, Version 17.0.2.174 Build 20170213
+
+Compiler options: -qopt-report=5 -xMIC-AVX512 -qopenmp -mkl -lmemkind -o app
+
+    Report from: Interprocedural optimizations [ipo]
+
+  WHOLE PROGRAM (SAFE) [EITHER METHOD]: false
+  WHOLE PROGRAM (SEEN) [TABLE METHOD]: false
+  WHOLE PROGRAM (READ) [OBJECT READER METHOD]: false
+
+INLINING OPTION VALUES:
+  -inline-factor: 100
+  -inline-min-size: 30
+  -inline-max-size: 230
+  -inline-max-total-size: 2000
+  -inline-max-per-routine: 10000
+  -inline-max-per-compile: 500000
+
+In the inlining report below:
+   "sz" refers to the "size" of the routine. The smaller a routine's size,
+      the more likely it is to be inlined.
+   "isz" refers to the "inlined size" of the routine. This is the amount
+      the calling routine will grow if the called routine is inlined into it.
+      The compiler generally limits the amount a routine can grow by having
+      routines inlined into it.
+
+Begin optimization report for: main()
+
+    Report from: Interprocedural optimizations [ipo]
+
+INLINE REPORT: (main()) [1/2=50.0%] main.cc(17,12)
+  -> EXTERN: (20,41) _mm_malloc(unsigned long long, unsigned long long)
+  -> EXTERN: (21,45) _mm_malloc(unsigned long long, unsigned long long)
+  -> EXTERN: (26,31) omp_get_wtime()
+  -> EXTERN: (26,54) omp_get_thread_num()
+  -> EXTERN: (29,5) vslNewStream(VSLStreamStatePtr *, int, unsigned int)
+  -> EXTERN: (33,7) vsRngUniform(int, VSLStreamStatePtr, int, float *, float, float)
+  -> EXTERN: (44,37) operator new(unsigned long)
+  -> EXTERN: (45,3) DftiCreateDescriptor_s_1d(DFTI_DESCRIPTOR_HANDLE *, DFTI_CONFIG_VALUE, ...)
+  -> EXTERN: (46,3) DftiCommitDescriptor(DFTI_DESCRIPTOR_HANDLE)
+  -> INLINE: (48,3) runFFTs_ref(size_t, size_t, MKL_Complex8 *, DFTI_DESCRIPTOR_HANDLE *) (isz = 16) (sz = 27)
+    -> EXTERN: (13,5) DftiComputeForward(DFTI_DESCRIPTOR_HANDLE, void *, ...)
+  -> EXTERN: (51,21) omp_get_wtime()
+  -> EXTERN: (52,3) runFFTs(size_t, size_t, MKL_Complex8 *, DFTI_DESCRIPTOR_HANDLE *)
+  -> EXTERN: (53,21) omp_get_wtime()
+  -> EXTERN: (69,5) printf(const char *, ...)
+  -> EXTERN: (72,5) printf(const char *, ...)
+  -> EXTERN: (74,3) DftiFreeDescriptor(DFTI_DESCRIPTOR_HANDLE *)
+  -> EXTERN: (75,3) _mm_free(void *)
+  -> EXTERN: (76,3) _mm_free(void *)
+
+
+    Report from: OpenMP optimizations [openmp]
+
+main.cc(24:1-24:1):OMP:main:  OpenMP DEFINED REGION WAS PARALLELIZED
+main.cc(57:1-57:1):OMP:main:  OpenMP DEFINED LOOP WAS PARALLELIZED
+
+    Report from: Loop nest, Vector & Auto-parallelization optimizations [loop, vec, par]
+
+
+LOOP BEGIN at main.cc(36,1)
+   remark #15389: vectorization support: reference ref_data[i] has unaligned access   [ main.cc(38,7) ]
+   remark #15389: vectorization support: reference data[i] has unaligned access   [ main.cc(38,26) ]
+   remark #15381: vectorization support: unaligned access used inside loop body
+   remark #15329: vectorization support: non-unit strided store was emulated for the variable <ref_data[i]>, stride is 2   [ main.cc(38,7) ]
+   remark #15328: vectorization support: non-unit strided load was emulated for the variable <data[i]>, stride is 2   [ main.cc(38,26) ]
+   remark #15329: vectorization support: non-unit strided store was emulated for the variable <ref_data[i]>, stride is 2   [ main.cc(39,7) ]
+   remark #15328: vectorization support: non-unit strided load was emulated for the variable <data[i]>, stride is 2   [ main.cc(39,26) ]
+   remark #15305: vectorization support: vector length 32
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15300: LOOP WAS VECTORIZED
+   remark #15452: unmasked strided loads: 2 
+   remark #15453: unmasked strided stores: 2 
+   remark #15475: --- begin vector cost summary ---
+   remark #15476: scalar cost: 9 
+   remark #15477: vector cost: 0.750 
+   remark #15478: estimated potential speedup: 11.990 
+   remark #15488: --- end vector cost summary ---
+LOOP END
+
+LOOP BEGIN at main.cc(36,1)
+<Remainder loop for vectorization>
+   remark #15389: vectorization support: reference ref_data[i] has unaligned access   [ main.cc(38,7) ]
+   remark #15389: vectorization support: reference data[i] has unaligned access   [ main.cc(38,26) ]
+   remark #15381: vectorization support: unaligned access used inside loop body
+   remark #15305: vectorization support: vector length 16
+   remark #15309: vectorization support: normalized vectorization overhead 0.556
+   remark #15301: REMAINDER LOOP WAS VECTORIZED
+LOOP END
+
+LOOP BEGIN at main.cc(58,3)
+   remark #15541: outer loop was not auto-vectorized: consider using SIMD directive
+
+   LOOP BEGIN at main.cc(59,5)
+      remark #25084: Preprocess Loopnests: Moving Out Store    [ main.cc(60,7) ]
+      remark #15344: loop was not vectorized: vector dependence prevents vectorization
+      remark #15346: vector dependence: assumed ANTI dependence between at (60:7) and at (60:7)
+      remark #15346: vector dependence: assumed FLOW dependence between at (60:7) and at (60:7)
+      remark #15346: vector dependence: assumed FLOW dependence between at (60:7) and at (60:7)
+      remark #15346: vector dependence: assumed ANTI dependence between at (60:7) and at (60:7)
+   LOOP END
+LOOP END
+
+
+Non-optimizable loops:
+
+
+LOOP BEGIN at main.cc(12,3) inlined into main.cc(48,3)
+   remark #15543: loop was not vectorized: loop with function call not considered an optimization candidate.
+LOOP END
+
+LOOP BEGIN at main.cc(31,5)
+   remark #15543: loop was not vectorized: loop with function call not considered an optimization candidate.
+LOOP END
+
+    Report from: Code generation optimizations [cg]
+
+main.cc(17,12):remark #34051: REGISTER ALLOCATION : [main] main.cc:17
+
+    Hardware registers
+        Reserved     :    2[ rsp rip]
+        Available    :   63[ rax rdx rcx rbx rbp rsi rdi r8-r15 mm0-mm7 zmm0-zmm31 k0-k7]
+        Callee-save  :    6[ rbx rbp r12-r15]
+        Assigned     :   42[ rax rdx rcx rbx rsi rdi r8-r15 zmm0-zmm19 k0-k7]
+        
+    Routine temporaries
+        Total         :     394
+            Global    :      92
+            Local     :     302
+        Regenerable   :     167
+        Spilled       :       4
+        
+    Routine stack
+        Variables     :     134 bytes*
+            Reads     :      20 [1.09e+01 ~ 0.9%]
+            Writes    :      20 [5.16e+01 ~ 4.3%]
+        Spills        :      72 bytes*
+            Reads     :      24 [8.00e+00 ~ 0.7%]
+            Writes    :      24 [9.00e+00 ~ 0.8%]
+    
+    Notes
+    
+        *Non-overlapping variables and spills may share stack space,
+         so the total stack size might be less than this.
+    
+
+===========================================================================
+
+Begin optimization report for: runFFTs_ref(size_t, size_t, MKL_Complex8 *, DFTI_DESCRIPTOR_HANDLE *)
+
+    Report from: Interprocedural optimizations [ipo]
+
+INLINE REPORT: (runFFTs_ref(size_t, size_t, MKL_Complex8 *, DFTI_DESCRIPTOR_HANDLE *)) [2/2=100.0%] main.cc(11,119)
+  -> EXTERN: (13,5) DftiComputeForward(DFTI_DESCRIPTOR_HANDLE, void *, ...)
+
+
+    Report from: Loop nest, Vector & Auto-parallelization optimizations [loop, vec, par]
+
+
+
+Non-optimizable loops:
+
+
+LOOP BEGIN at main.cc(12,3)
+   remark #15543: loop was not vectorized: loop with function call not considered an optimization candidate.
+LOOP END
+
+    Report from: Code generation optimizations [cg]
+
+main.cc(11,119):remark #34051: REGISTER ALLOCATION : [_Z11runFFTs_refmmP13_MKL_Complex8PP15DFTI_DESCRIPTOR] main.cc:11
+
+    Hardware registers
+        Reserved     :    2[ rsp rip]
+        Available    :   63[ rax rdx rcx rbx rbp rsi rdi r8-r15 mm0-mm7 zmm0-zmm31 k0-k7]
+        Callee-save  :    6[ rbx rbp r12-r15]
+        Assigned     :   10[ rax rdx rcx rbx rsi rdi r12-r15]
+        
+    Routine temporaries
+        Total         :      19
+            Global    :      11
+            Local     :       8
+        Regenerable   :       1
+        Spilled       :       5
+        
+    Routine stack
+        Variables     :       0 bytes*
+            Reads     :       0 [0.00e+00 ~ 0.0%]
+            Writes    :       0 [0.00e+00 ~ 0.0%]
+        Spills        :      40 bytes*
+            Reads     :       5 [4.50e+00 ~ 5.9%]
+            Writes    :       5 [4.50e+00 ~ 5.9%]
+    
+    Notes
+    
+        *Non-overlapping variables and spills may share stack space,
+         so the total stack size might be less than this.
+    
+
+===========================================================================

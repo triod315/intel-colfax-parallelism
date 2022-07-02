@@ -1,0 +1,172 @@
+Intel(R) Advisor can now assist with vectorization and show optimization
+  report messages with your source code.
+See "https://software.intel.com/en-us/intel-advisor-xe" for details.
+
+Intel(R) C++ Intel(R) 64 Compiler for applications running on Intel(R) 64, Version 17.0.2.174 Build 20170213
+
+Compiler options: -c -qopt-report=5 -xMIC-AVX512 -qopenmp -mkl -lmemkind -o worker.o
+
+    Report from: Interprocedural optimizations [ipo]
+
+  WHOLE PROGRAM (SAFE) [EITHER METHOD]: false
+  WHOLE PROGRAM (SEEN) [TABLE METHOD]: false
+  WHOLE PROGRAM (READ) [OBJECT READER METHOD]: false
+
+INLINING OPTION VALUES:
+  -inline-factor: 100
+  -inline-min-size: 30
+  -inline-max-size: 230
+  -inline-max-total-size: 2000
+  -inline-max-per-routine: 10000
+  -inline-max-per-compile: 500000
+
+In the inlining report below:
+   "sz" refers to the "size" of the routine. The smaller a routine's size,
+      the more likely it is to be inlined.
+   "isz" refers to the "inlined size" of the routine. This is the amount
+      the calling routine will grow if the called routine is inlined into it.
+      The compiler generally limits the amount a routine can grow by having
+      routines inlined into it.
+
+Begin optimization report for: runFFTs(size_t, size_t, MKL_Complex8 *, DFTI_DESCRIPTOR_HANDLE *)
+
+    Report from: Interprocedural optimizations [ipo]
+
+INLINE REPORT: (runFFTs(size_t, size_t, MKL_Complex8 *, DFTI_DESCRIPTOR_HANDLE *)) [1/1=100.0%] worker.cc(5,115)
+  -> EXTERN: (7,3) hbw_posix_memalign(void **, size_t, size_t)
+  -> EXTERN: (16,5) DftiComputeForward(DFTI_DESCRIPTOR_HANDLE, void *, ...)
+  -> EXTERN: (23,3) hbw_free(void *)
+
+
+    Report from: OpenMP optimizations [openmp]
+
+worker.cc(9:5-9:5):OMP:_Z7runFFTsmmP13_MKL_Complex8PP15DFTI_DESCRIPTOR:  OpenMP DEFINED LOOP WAS PARALLELIZED
+worker.cc(17:5-17:5):OMP:_Z7runFFTsmmP13_MKL_Complex8PP15DFTI_DESCRIPTOR:  OpenMP DEFINED LOOP WAS PARALLELIZED
+
+    Report from: Loop nest, Vector & Auto-parallelization optimizations [loop, vec, par]
+
+
+LOOP BEGIN at worker.cc(9,5)
+<Multiversioned v1>
+   remark #25228: Loop multiversioned for Data Dependence
+   remark #15389: vectorization support: reference buffer[j] has unaligned access   [ worker.cc(12,2) ]
+   remark #15389: vectorization support: reference data->real[j+i*fft_size] has unaligned access   [ worker.cc(12,19) ]
+   remark #15381: vectorization support: unaligned access used inside loop body
+   remark #15329: vectorization support: non-unit strided store was emulated for the variable <buffer[j]>, stride is 2   [ worker.cc(12,2) ]
+   remark #15328: vectorization support: non-unit strided load was emulated for the variable <data->real[j+i*fft_size]>, stride is 2   [ worker.cc(12,19) ]
+   remark #15329: vectorization support: non-unit strided store was emulated for the variable <buffer[j]>, stride is 2   [ worker.cc(13,2) ]
+   remark #15328: vectorization support: non-unit strided load was emulated for the variable <data->imag[j+i*fft_size]>, stride is 2   [ worker.cc(13,19) ]
+   remark #15305: vectorization support: vector length 32
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15300: LOOP WAS VECTORIZED
+   remark #15452: unmasked strided loads: 2 
+   remark #15453: unmasked strided stores: 2 
+   remark #15475: --- begin vector cost summary ---
+   remark #15476: scalar cost: 9 
+   remark #15477: vector cost: 0.750 
+   remark #15478: estimated potential speedup: 9.990 
+   remark #15488: --- end vector cost summary ---
+LOOP END
+
+LOOP BEGIN at worker.cc(9,5)
+<Remainder loop for vectorization, Multiversioned v1>
+   remark #15389: vectorization support: reference buffer[j] has unaligned access   [ worker.cc(12,2) ]
+   remark #15389: vectorization support: reference data->real[j+i*fft_size] has unaligned access   [ worker.cc(12,19) ]
+   remark #15381: vectorization support: unaligned access used inside loop body
+   remark #15305: vectorization support: vector length 16
+   remark #15309: vectorization support: normalized vectorization overhead 0.556
+   remark #15301: REMAINDER LOOP WAS VECTORIZED
+LOOP END
+
+LOOP BEGIN at worker.cc(9,5)
+<Multiversioned v2>
+   remark #15304: loop was not vectorized: non-vectorizable loop instance from multiversioning
+   remark #25439: unrolled with remainder by 2  
+LOOP END
+
+LOOP BEGIN at worker.cc(9,5)
+<Remainder, Multiversioned v2>
+LOOP END
+
+LOOP BEGIN at worker.cc(17,5)
+<Multiversioned v1>
+   remark #25228: Loop multiversioned for Data Dependence
+   remark #15389: vectorization support: reference data->real[j+i*fft_size] has unaligned access   [ worker.cc(19,6) ]
+   remark #15389: vectorization support: reference buffer[j] has unaligned access   [ worker.cc(19,34) ]
+   remark #15381: vectorization support: unaligned access used inside loop body
+   remark #15329: vectorization support: non-unit strided store was emulated for the variable <data->real[j+i*fft_size]>, stride is 2   [ worker.cc(19,6) ]
+   remark #15328: vectorization support: non-unit strided load was emulated for the variable <buffer[j]>, stride is 2   [ worker.cc(19,34) ]
+   remark #15329: vectorization support: non-unit strided store was emulated for the variable <data->imag[j+i*fft_size]>, stride is 2   [ worker.cc(20,2) ]
+   remark #15328: vectorization support: non-unit strided load was emulated for the variable <buffer[j]>, stride is 2   [ worker.cc(20,30) ]
+   remark #15305: vectorization support: vector length 32
+   remark #15309: vectorization support: normalized vectorization overhead 0.250
+   remark #15300: LOOP WAS VECTORIZED
+   remark #15452: unmasked strided loads: 2 
+   remark #15453: unmasked strided stores: 2 
+   remark #15475: --- begin vector cost summary ---
+   remark #15476: scalar cost: 9 
+   remark #15477: vector cost: 0.750 
+   remark #15478: estimated potential speedup: 9.990 
+   remark #15488: --- end vector cost summary ---
+LOOP END
+
+LOOP BEGIN at worker.cc(17,5)
+<Remainder loop for vectorization, Multiversioned v1>
+   remark #15389: vectorization support: reference data->real[j+i*fft_size] has unaligned access   [ worker.cc(19,6) ]
+   remark #15389: vectorization support: reference buffer[j] has unaligned access   [ worker.cc(19,34) ]
+   remark #15381: vectorization support: unaligned access used inside loop body
+   remark #15305: vectorization support: vector length 16
+   remark #15309: vectorization support: normalized vectorization overhead 0.556
+   remark #15301: REMAINDER LOOP WAS VECTORIZED
+LOOP END
+
+LOOP BEGIN at worker.cc(17,5)
+<Multiversioned v2>
+   remark #15304: loop was not vectorized: non-vectorizable loop instance from multiversioning
+   remark #25439: unrolled with remainder by 2  
+LOOP END
+
+LOOP BEGIN at worker.cc(17,5)
+<Remainder, Multiversioned v2>
+LOOP END
+
+
+Non-optimizable loops:
+
+
+LOOP BEGIN at worker.cc(8,3)
+   remark #15521: loop was not vectorized: loop control variable was not identified. Explicitly compute the iteration count before executing the loop or try using canonical loop form from OpenMP specification
+LOOP END
+
+    Report from: Code generation optimizations [cg]
+
+worker.cc(5,115):remark #34051: REGISTER ALLOCATION : [_Z7runFFTsmmP13_MKL_Complex8PP15DFTI_DESCRIPTOR] worker.cc:5
+
+    Hardware registers
+        Reserved     :    2[ rsp rip]
+        Available    :   63[ rax rdx rcx rbx rbp rsi rdi r8-r15 mm0-mm7 zmm0-zmm31 k0-k7]
+        Callee-save  :    6[ rbx rbp r12-r15]
+        Assigned     :   38[ rax rdx rcx rbx rsi rdi r8-r15 zmm0-zmm15 k0-k7]
+        
+    Routine temporaries
+        Total         :     352
+            Global    :     107
+            Local     :     245
+        Regenerable   :      99
+        Spilled       :       4
+        
+    Routine stack
+        Variables     :      92 bytes*
+            Reads     :      12 [1.20e+01 ~ 0.4%]
+            Writes    :      13 [2.09e+02 ~ 6.9%]
+        Spills        :      72 bytes*
+            Reads     :      19 [5.00e+00 ~ 0.2%]
+            Writes    :      19 [7.50e+01 ~ 2.5%]
+    
+    Notes
+    
+        *Non-overlapping variables and spills may share stack space,
+         so the total stack size might be less than this.
+    
+
+===========================================================================
